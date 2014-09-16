@@ -1,0 +1,90 @@
+---
+title: 'Statistical Inference'
+output:
+  pdf_document:
+    fig_width: 5
+    fig_height: 4
+    fig_caption: true
+    highlight: tango
+   
+---
+
+
+Basic inferential data analysis
+===
+
+We're going to analyze the ToothGrowth data in the R datasets package. 
+
+1. Load the ToothGrowth data and perform some basic exploratory data analyses 
+2. Provide a basic summary of the data.
+3. Use confidence intervals and hypothesis tests to compare tooth growth by supp and dose. (Use the techniques from class even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions. 
+
+We load the data and perform some basic exploratory data analysis, plus the summary of th data:
+
+```{r}
+library(datasets)
+
+class(ToothGrowth)
+summary(ToothGrowth)
+dim(ToothGrowth)
+names <- names(ToothGrowth)
+levels(ToothGrowth)
+str(ToothGrowth)
+```
+
+So, we see it is a data frame which has two dimensions: 60, 3, with no levels. The names are `r names`.
+
+Next, we go to point three where we plot what we have in Appendix as code chunk 1 with figure 1. From it we can see that the tooth increases as the dosage increases. We create a regression analysis to test in deeper the data. This model can be found in the Appendix in code chunk 2 with results. Afterwards we apply the confidence intervals function and we have it in the Appendix in code chunk 3 with results. Next, in the code chunk 4 (see Appendix), we apply the t test functions, so we get the `p` values.
+
+From these analyses in point 3, we can go to conclusions (point 4):
+
+1. As stated earlier from the box plots we see that: the tooth increases as the dosage increases.
+2. The p values calculated earlier show that each variable proves the variability in tooth length.  
+
+
+\newpage
+
+Appendix
+===
+
+Code chunk 1 with figure 1
+
+```{r, 1}
+library(ggplot2)
+comparePlot <- ggplot(ToothGrowth, aes(factor(dose), len, fill = factor(dose))) 
+comparePlot + 
+      geom_boxplot() + 
+      facet_grid(. ~ supp) +  
+      xlab('Factor by dose') +
+      ylab('Length of tooth')
+```
+
+Code chunk 2 with results:
+
+```{r, 2}
+myModel <- lm(len ~ dose + supp, ToothGrowth)
+summary(myModel)
+```
+
+Code chunk 3 with results:
+
+```{r, 3}
+confint(myModel)
+```
+
+Code chunk 4 with results:
+
+```{r, 4}
+firstDose <- ToothGrowth[ToothGrowth$dose == 0.5,]
+testFirstDose <- t.test(len ~ supp, data = firstDose)
+testFirstDose$p.value; 
+
+secondDose <- ToothGrowth[ToothGrowth$dose == 1.0,]
+testSecondDose <- t.test(len ~ supp, data = secondDose)
+testSecondDose$p.value; 
+
+thirdDose <- ToothGrowth[ToothGrowth$dose == 2.0,]
+testThirdDose <- t.test(len ~ supp, data = thirdDose)
+testThirdDose$p.value;
+```
